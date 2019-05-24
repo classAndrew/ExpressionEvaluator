@@ -1,6 +1,7 @@
 package andrxw.me.expreval;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Tokenizer {
 	
@@ -24,6 +25,51 @@ public class Tokenizer {
 			i++; 
 		}
 		return tokenized;
+	}
+	
+	// Shunting-Yard
+	
+	public static ArrayList<String> getRPN(ArrayList<String> tokenized) {
+		ArrayList<String> RPN = new ArrayList<String>();
+		Stack<String> stack = new Stack<String>();
+		int i = 0;
+		while (i < tokenized.size()) {
+			String token = tokenized.get(i);
+			if (Identifier.isNumber(token)) {
+				RPN.add(token);
+			} else if (token.equals("(")) {
+				stack.push(token);
+			}
+			else if (token.equals(")")) {
+				while (true) {
+					String s = stack.pop();
+					if (!s.equals("(")) {
+						RPN.add(s);
+					} else {
+						break;
+					}
+				}
+			}
+			else {
+				if (stack.size() == 0 || stack.peek().equals("(")) {
+					stack.push(token);
+				} else if (Identifier.getPrecedence(stack.peek()) > Identifier.getPrecedence(token)) {
+					stack.push(token);
+				} else {
+					RPN.add(stack.pop());
+					stack.push(token);
+				}
+			}
+			i++;
+		}
+		for (int j = 0; j < stack.size(); j++) {
+			RPN.add(stack.pop());
+		}
+		return RPN;
+	}
+	
+	private static void breakVariables(ArrayList<String> ref) {
+		// will turn '5x' into '5','*','x'
 	}
 
 }
