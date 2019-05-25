@@ -11,6 +11,7 @@ public class Utils {
 		for (int i = 0; i < obj.size(); i++) {
 			System.out.print("'" + obj.get(i) + "'" + ((i == obj.size()-1) ? "" : ", "));
 		}
+		System.out.println("");
 	}
 	
 	

@@ -24,6 +24,7 @@ public class Tokenizer {
 			}
 			i++; 
 		}
+		tokenized.add(sb.toString());
 		return tokenized;
 	}
 	
@@ -43,17 +44,16 @@ public class Tokenizer {
 			else if (token.equals(")")) {
 				while (true) {
 					String s = stack.pop();
-					if (!s.equals("(")) {
-						RPN.add(s);
-					} else {
+					if (s.equals("(")) {
 						break;
+					} else {
+						RPN.add(s);
 					}
 				}
-			}
-			else {
-				if (stack.size() == 0 || stack.peek().equals("(")) {
+			} else {
+				if (stack.isEmpty() || stack.peek().equals("(")) {
 					stack.push(token);
-				} else if (Identifier.getPrecedence(stack.peek()) > Identifier.getPrecedence(token)) {
+				} else if (Identifier.getPrecedence(token) > Identifier.getPrecedence(stack.peek())) {
 					stack.push(token);
 				} else {
 					RPN.add(stack.pop());
