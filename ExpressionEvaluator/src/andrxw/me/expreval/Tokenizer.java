@@ -38,7 +38,8 @@ public class Tokenizer {
 			String token = tokenized.get(i);
 			if (Identifier.isNumber(token)) {
 				RPN.add(token);
-			} else if (token.equals("(")) {
+			}
+			else if (token.equals("(")) {
 				stack.push(token);
 			}
 			else if (token.equals(")")) {

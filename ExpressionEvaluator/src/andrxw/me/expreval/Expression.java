@@ -27,22 +27,27 @@ public class Expression {
 			if (prec != null) {
 				switch(RPN.get(i)) {
 				case "+":
-					int sum = Integer.valueOf(RPN.get(i-2))+Integer.valueOf(RPN.get(i-1));
+					double sum = Double.valueOf(RPN.get(i-2))+Double.valueOf(RPN.get(i-1));
 					RPN.remove(i--);
 					RPN.remove(i--);
 					RPN.set(i, String.valueOf(sum));
 					break;
 				case "-":
-					int left = Integer.valueOf(RPN.get(i-2))-Integer.valueOf(RPN.get(i-1));
+					double left = Double.valueOf(RPN.get(i-2))-Double.valueOf(RPN.get(i-1));
 					RPN.remove(i--);
 					RPN.remove(i--);
 					RPN.set(i, String.valueOf(left));
 					break;
 				case "*":
-					int product = Integer.valueOf(RPN.get(i-2))*Integer.valueOf(RPN.get(i-1));
+					double product = Double.valueOf(RPN.get(i-2))*Double.valueOf(RPN.get(i-1));
 					RPN.remove(i--);
 					RPN.remove(i--);
 					RPN.set(i, String.valueOf(product));
+					break;
+				case "sin":
+					double res = Double.valueOf(Math.sin(Double.valueOf(RPN.get(i-1))));
+					RPN.remove(i--);
+					RPN.set(i, String.valueOf(res));
 					break;
 				default:
 					System.out.println("Unknown Operation");
@@ -74,6 +79,25 @@ public class Expression {
 		}
 		tokenized.add(sb.toString());
 		this.tokenized = tokenized;
+		functionPreprocess();
+	}
+	
+	private void functionPreprocess() {
+		// Arranged as [[sin, index], [cos, index], [sin, index]...]
+		Stack<String[]> functions = new Stack<String[]>();
+		int i = 0;
+		while (i < tokenized.size()) {
+			if (tokenized.get(i).equals("sin")) {
+				functions.push(new String[] {tokenized.get(i)});
+				tokenized.remove(i--);
+			}
+			else if(tokenized.get(i).equals(")")) {
+				String[] last = functions.pop();
+				tokenized.add(++i, last[0]);
+			}
+			i++;
+		}
+		Utils.printArrList(tokenized);
 	}
 	
 	private void toRPN() {
