@@ -25,27 +25,44 @@ public class Expression {
 		while (i < RPN.size()) {
 			Integer prec = Identifier.getPrecedence(RPN.get(i));
 			if (prec != null) {
+				double res;
 				switch(RPN.get(i)) {
 				case "+":
-					double sum = Double.valueOf(RPN.get(i-2))+Double.valueOf(RPN.get(i-1));
+					res = Double.valueOf(RPN.get(i-2))+Double.valueOf(RPN.get(i-1));
 					RPN.remove(i--);
 					RPN.remove(i--);
-					RPN.set(i, String.valueOf(sum));
+					RPN.set(i, String.valueOf(res));
 					break;
 				case "-":
-					double left = Double.valueOf(RPN.get(i-2))-Double.valueOf(RPN.get(i-1));
+					res = Double.valueOf(RPN.get(i-2))-Double.valueOf(RPN.get(i-1));
 					RPN.remove(i--);
 					RPN.remove(i--);
-					RPN.set(i, String.valueOf(left));
+					RPN.set(i, String.valueOf(res));
+					break;
+				case "/":
+					res = Double.valueOf(RPN.get(i-2))/Double.valueOf(RPN.get(i-1));
+					RPN.remove(i--);
+					RPN.remove(i--);
+					RPN.set(i, String.valueOf(res));
 					break;
 				case "*":
-					double product = Double.valueOf(RPN.get(i-2))*Double.valueOf(RPN.get(i-1));
+					res = Double.valueOf(RPN.get(i-2))*Double.valueOf(RPN.get(i-1));
 					RPN.remove(i--);
 					RPN.remove(i--);
-					RPN.set(i, String.valueOf(product));
+					RPN.set(i, String.valueOf(res));
 					break;
 				case "sin":
-					double res = Double.valueOf(Math.sin(Double.valueOf(RPN.get(i-1))));
+					res = Double.valueOf(Math.sin(Double.valueOf(RPN.get(i-1))));
+					RPN.remove(i--);
+					RPN.set(i, String.valueOf(res));
+					break;
+				case "cos":
+					res = Double.valueOf(Math.cos(Double.valueOf(RPN.get(i-1))));
+					RPN.remove(i--);
+					RPN.set(i, String.valueOf(res));
+					break;
+				case "tan":
+					res = Double.valueOf(Math.tan(Double.valueOf(RPN.get(i-1))));
 					RPN.remove(i--);
 					RPN.set(i, String.valueOf(res));
 					break;
@@ -66,14 +83,14 @@ public class Expression {
 		int i = 0;
 		while (i < expr.length()) {
 			// if is character then add it to the buffer
-			if (Character.isAlphabetic(charmap[i]) || Character.isDigit(charmap[i])) {
+			if (Character.isAlphabetic(charmap[i]) || Character.isDigit(charmap[i]) || charmap[i] == '.') {
 				sb.append(String.valueOf(charmap[i]));
 			}
 			else if (charmap[i] != ' '){
 				if (sb.length() > 0)
 					tokenized.add(sb.toString());
 				sb = new StringBuilder();
-				tokenized.add(String.valueOf(charmap[i]));
+				tokenized.add(String.valueOf(charmap[i]));	
 			}
 			i++; 
 		}
@@ -84,16 +101,19 @@ public class Expression {
 	
 	private void functionPreprocess() {
 		// Arranged as [[sin, index], [cos, index], [sin, index]...]
-		Stack<String[]> functions = new Stack<String[]>();
+		Stack<String> functions = new Stack<String>();
 		int i = 0;
 		while (i < tokenized.size()) {
-			if (tokenized.get(i).equals("sin")) {
-				functions.push(new String[] {tokenized.get(i)});
+			if (Functions.isFunction(tokenized.get(i))) {
+				functions.push(tokenized.get(i));
+				tokenized.remove(i--);
+			}
+			else if(tokenized.get(i).equals("")) {
 				tokenized.remove(i--);
 			}
 			else if(tokenized.get(i).equals(")")) {
-				String[] last = functions.pop();
-				tokenized.add(++i, last[0]);
+				String last = functions.pop();
+				tokenized.add(++i, last);
 			}
 			i++;
 		}
