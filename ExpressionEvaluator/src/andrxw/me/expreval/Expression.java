@@ -19,7 +19,7 @@ public class Expression {
 	public ArrayList<String> getRPN() {
 		return RPN;
 	}
-
+	
 	public void evaluate() {
 		int i = 0;
 		while (i < RPN.size()) {
@@ -66,6 +66,12 @@ public class Expression {
 					RPN.remove(i--);
 					RPN.set(i, String.valueOf(res));
 					break;
+				case "pow":
+					res = Double.valueOf(Math.pow(Double.valueOf(RPN.get(i-2)), Double.valueOf(RPN.get(i-1))));
+					RPN.remove(i--);
+					RPN.remove(i--);
+					RPN.set(i, String.valueOf(res));
+					break;
 				default:
 					System.out.println("Unknown Operation");
 					break;
@@ -87,7 +93,7 @@ public class Expression {
 				sb.append(String.valueOf(charmap[i]));
 			}
 			else if (charmap[i] != ' '){
-				if (sb.length() > 0)
+				if (sb.length() > 0 || charmap[i]==',') // The comma condition to check if multi arg the comma is gone in preprocess
 					tokenized.add(sb.toString());
 				sb = new StringBuilder();
 				tokenized.add(String.valueOf(charmap[i]));	
@@ -108,7 +114,7 @@ public class Expression {
 				functions.push(tokenized.get(i));
 				tokenized.remove(i--);
 			}
-			else if(tokenized.get(i).equals("")) {
+			else if(tokenized.get(i).equals("") || tokenized.get(i).equals(",")) {
 				tokenized.remove(i--);
 			}
 			else if(tokenized.get(i).equals(")")) {
